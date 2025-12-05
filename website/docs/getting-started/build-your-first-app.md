@@ -19,6 +19,74 @@ java -version
 mvn -version
 ```
 
+## Project Setup
+
+### Create the Greeting App Project
+
+We'll create a simple greeting application that demonstrates JMiniApp's core features. First, navigate to the JMiniApp examples directory and create the project structure:
+
+```bash
+# Navigate to the JMiniApp repository examples folder from the framework root folder
+cd examples
+
+# Generate a Maven project for the greeting app
+mvn archetype:generate \
+  -DgroupId=com.jminiapp.examples \
+  -DartifactId=greeting \
+  -DarchetypeArtifactId=maven-archetype-quickstart \
+  -DarchetypeVersion=1.4 \
+  -DinteractiveMode=false
+
+# Navigate into the generated project
+cd greeting
+```
+
+This creates the basic structure:
+```
+greeting/
+├── pom.xml
+└── src/main/java/com/jminiapp/examples/
+    └── App.java
+```
+
+:::tip Project Location
+For this tutorial, we're creating the example in the `examples/` folder of the JMiniApp repository. This allows you to explore the framework alongside the counter example.
+
+For your own applications, you can create projects anywhere outside the framework repository.
+:::
+
+### Configure the Project
+
+ 
+#### 1. Update `pom.xml`
+
+Open `pom.xml` and update it with the following configuration:
+
+```xml
+<properties>
+  <maven.compiler.source>17</maven.compiler.source>
+  <maven.compiler.target>17</maven.compiler.target>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+</properties>
+```
+
+#### 2. Create the Package Structure
+
+Delete the generated `App.java` and create the proper package structure for the greeting app:
+
+```bash
+# Remove the generated file
+rm src/main/java/com/jminiapp/examples/App.java
+
+# Remove the tests folder for now, we can add it later
+rm -rv src/test
+
+# Create the greeting package directory
+mkdir -p src/main/java/com/jminiapp/examples/greeting
+```
+
+Your project is now ready for the greeting app code!
+
 ## Step 1: Add JMiniApp to Your Project
 
 Add the dependency to your `pom.xml`:
@@ -27,7 +95,7 @@ Add the dependency to your `pom.xml`:
 <dependency>
     <groupId>com.jminiapp</groupId>
     <artifactId>jminiapp-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -37,10 +105,10 @@ JMiniApp must be [built from source](installation#building-from-source) first, a
 
 ## Step 2: Create Your State Model
 
-Create a simple model class to represent your application state:
+Create a simple model class to represent your application state in `src/main/java/com/jminiapp/examples/greeting/Greeting.java`:
 
 ```java
-package com.example.hello;
+package com.jminiapp.examples.greeting;
 
 public class Greeting {
     private String message;
@@ -67,19 +135,19 @@ public class Greeting {
 
 ## Step 3: Create Your Application
 
-Extend `JMiniApp` and implement the three lifecycle methods:
+Extend `JMiniApp` and implement the three lifecycle methods in `src/main/java/com/jminiapp/examples/greeting/GreetingApp.java`:
 
 ```java
-package com.example.hello;
+package com.jminiapp.examples.greeting;
 
 import com.jminiapp.core.api.*;
 import java.util.*;
 
-public class HelloApp extends JMiniApp {
+public class GreetingApp extends JMiniApp {
     private Greeting greeting;
 
     // Required constructor
-    public HelloApp(JMiniAppConfig config) {
+    public GreetingApp(JMiniAppConfig config) {
         super(config);
     }
 
@@ -121,17 +189,17 @@ public class HelloApp extends JMiniApp {
 
 ## Step 4: Bootstrap Your Application
 
-Use `JMiniAppRunner` to configure and launch:
+Use `JMiniAppRunner` to configure and launch in `src/main/java/com/jminiapp/examples/greeting/GreetingAppRunner.java`:
 
 ```java
-package com.example.hello;
+package com.jminiapp.examples.greeting;
 
 import com.jminiapp.core.engine.JMiniAppRunner;
 
-public class Main {
+public class GreetingAppRunner {
     public static void main(String[] args) {
         JMiniAppRunner
-            .forApp(HelloApp.class)
+            .forApp(GreetingApp.class)
             .withState(Greeting.class)
             .run(args);
     }
@@ -149,7 +217,7 @@ Compile and run:
 
 ```bash
 mvn clean package
-mvn exec:java -Dexec.mainClass="com.example.hello.Main"
+mvn exec:java -Dexec.mainClass="com.jminiapp.examples.greeting.GreetingAppRunner"
 ```
 
 You should see:
@@ -189,14 +257,17 @@ Want to export your data to JSON files? Let's enhance the application.
 
 ### Step 1: Create a JSON Adapter
 
+Create `src/main/java/com/jminiapp/examples/greeting/GreetingJSONAdapter.java`:
+
 ```java
-package com.example.hello;
+package com.jminiapp.examples.greeting;
 
 import com.jminiapp.core.adapters.JSONAdapter;
 
-public class GreetingJSONAdapter extends JSONAdapter<Greeting> {
-    public GreetingJSONAdapter() {
-        super(Greeting.class);
+public class GreetingJSONAdapter implements JSONAdapter<Greeting> {
+    @Override
+    public Class<Greeting> getstateClass() {
+        return Greeting.class;
     }
 }
 ```
@@ -205,15 +276,16 @@ public class GreetingJSONAdapter extends JSONAdapter<Greeting> {
 
 ### Step 2: Register the Adapter
 
-Update your bootstrap configuration:
+Update your bootstrap configuration in `GreetingAppRunner.java`:
 
 ```java
-public class Main {
+public class GreetingAppRunner {
     public static void main(String[] args) {
         JMiniAppRunner
-            .forApp(HelloApp.class)
+            .forApp(GreetingApp.class)
+            .named("Greeting")
             .withState(Greeting.class)
-            .withAdapters(new GreetingJSONAdapter())  // ← Register adapter
+            .withAdapters(new GreetingJSONAdapter())
             .run(args);
     }
 }
@@ -231,8 +303,8 @@ protected void shutdown() {
 
     // Export to JSON file
     try {
-        context.exportData("greeting.json", "json");
-        System.out.println("Greeting exported to greeting.json");
+        context.exportData("json");
+        System.out.println("Greeting exported to Greeting.json");
     } catch (Exception e) {
         System.err.println("Failed to export: " + e.getMessage());
     }
@@ -266,20 +338,21 @@ You can now:
 Your complete project should look like this:
 
 ```
-my-app/
+greeting/
 ├── pom.xml
 └── src/
     └── main/
         ├── java/
         │   └── com/
-        │       └── example/
-        │           └── hello/
-        │               ├── Greeting.java           # State model
-        │               ├── HelloApp.java           # Application class
-        │               ├── GreetingJSONAdapter.java # JSON adapter (optional)
-        │               └── Main.java               # Bootstrap
+        │       └── jminiapp/
+        │           └── examples/
+        │               └── greeting/
+        │                   ├── Greeting.java           # State model
+        │                   ├── GreetingApp.java        # Application class
+        │                   ├── GreetingJSONAdapter.java # JSON adapter (optional)
+        │                   └── GreetingAppRunner.java  # Bootstrap
         └── resources/
-            └── greeting.json                       # Exported data (generated)
+            └── greeting.json                           # Exported data (generated)
 ```
 
 ## Next Steps

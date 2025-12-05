@@ -63,13 +63,6 @@ Check out the **[Counter App](./examples/counter)** - a complete example demonst
 - Clean application lifecycle implementation
 - Import/export functionality
 
-Run it with:
-```bash
-cd examples/counter
-mvn clean package
-mvn exec:java
-```
-
 ## Project Structure
 
 ```
