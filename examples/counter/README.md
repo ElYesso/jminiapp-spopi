@@ -144,7 +144,7 @@ Counter decremented to: 1
 6. Exit
 
 Choose an option: 4
-Enter filename to export (e.g., counter.json): my-counter.json
+Enter filename to export (e.g., Counter.json): my-counter.json
 Counter state exported successfully to: /path/to/my-counter.json
 ```
 
@@ -169,7 +169,7 @@ The exported JSON file will look like:
 6. Exit
 
 Choose an option: 5
-Enter filename to import (e.g., counter.json): my-counter.json
+Enter filename to import (e.g., Counter.json): my-counter.json
 Counter state imported successfully! New value: 5
 ```
 
