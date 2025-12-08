@@ -4,14 +4,14 @@ sidebar_position: 2
 
 # Music Wrapped (Spopi)
 
-A listening-stats example that shows how to import/export JSON data, ingest new play events, and keep live top artists/songs with JMiniApp.
+A listening-stats example that shows how to import/export CSV data (no JSON dependency), ingest new play events, and keep live top artists/songs with JMiniApp.
 
 **Source Code:** [examples/music-wrapped](https://github.com/jminiapp/jminiapp/tree/main/examples/music-wrapped)
 
 ## Features
 
 - **Aggregated Stats** – total minutes listened, minutes per artist/song
-- **JSON Import/Export** – load and persist state from/to `data/music_stats.json`
+- **CSV Import/Export** – load and persist state from/to `data/music_stats.csv` using pipe/colon encoding for maps/lists
 - **Live Updates** – add play events (song, artist, minutes) and recompute top lists
 - **Interactive Menu** – numeric console options for import/export/add/quit
 
@@ -47,7 +47,7 @@ Imports stats on startup, loops with menu, saves on exit:
 public class MusicWrappedApp extends JMiniApp {
 	@Override
 	protected void initialize() {
-		context.importData("data/music_stats.json", "json");
+		context.importData("data/music_stats.csv", "csv");
 		// load state into memory
 	}
 
@@ -63,15 +63,20 @@ public class MusicWrappedApp extends JMiniApp {
 }
 ```
 
-### JSON Adapter
+### CSV Adapter
 
-Wires the state to JSON format:
+Serializes maps/lists without JSON, using pipe-separated entries and `key:value` pairs:
 
 ```java
-public class MusicWrappedJSONAdapter implements JSONAdapter<MusicWrappedState> {
+public class MusicWrappedCSVAdapter implements CSVAdapter<MusicWrappedState> {
 	@Override
-	public Class<MusicWrappedState> getstateClass() {
-		return MusicWrappedState.class;
+	public String[] toCSV(MusicWrappedState state) {
+		// totalMinutes, artistMinutes, songMinutes, topArtists, topSongs
+	}
+
+	@Override
+	public MusicWrappedState fromCSV(String[] fields) {
+		// parse pipe/colon encoded fields back into the state
 	}
 }
 ```
@@ -86,7 +91,7 @@ public class MusicWrappedAppRunner {
 		JMiniAppRunner
 			.forApp(MusicWrappedApp.class)
 			.withState(MusicWrappedState.class)
-			.withAdapters(new MusicWrappedJSONAdapter())
+			.withAdapters(new MusicWrappedCSVAdapter())
 			.withResourcesPath("examples/music-wrapped/src/main/resources/")
 			.named("MusicWrapped")
 			.run(args);
@@ -122,4 +127,4 @@ Minutes listened: 5
 Recorded play for 'New Song' by New Artist (+5 min)
 ```
 
-The exported JSON (after updates) stays in `src/main/resources/data/music_stats.json`.
+The exported CSV (after updates) stays in `src/main/resources/data/music_stats.csv` using the pipe/colon encoding.

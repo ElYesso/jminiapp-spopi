@@ -16,7 +16,7 @@ public class MusicWrappedAppRunner {
         JMiniAppRunner
             .forApp(MusicWrappedApp.class)
             .withState(MusicWrappedState.class)
-            .withAdapters(new MusicWrappedJSONAdapter())
+                .withAdapters(new MusicWrappedCSVAdapter())
             // Use an absolute resources path that works from both repo root and module dir
             .withResourcesPath(resourcesPath.toString())
             .named("MusicWrapped")

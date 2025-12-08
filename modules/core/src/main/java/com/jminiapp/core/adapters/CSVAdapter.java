@@ -148,18 +148,25 @@ public interface CSVAdapter<T> extends JMiniFormatAdapter<T> {
         List<String> fields = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean inQuotes = false;
+        char prev = 0;
 
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
 
             if (c == '"') {
-                inQuotes = !inQuotes;
+                if (prev == '\\') {
+                    // Escaped quote, keep it as a literal character.
+                    current.append(c);
+                } else {
+                    inQuotes = !inQuotes;
+                }
             } else if (c == getDelimiter().charAt(0) && !inQuotes) {
                 fields.add(current.toString());
                 current = new StringBuilder();
             } else {
                 current.append(c);
             }
+            prev = c;
         }
         fields.add(current.toString());
 

@@ -1,19 +1,19 @@
 # Music Wrapped "Spopi" Example
 
-A small example app that ingests listening events, keeps aggregated stats, and imports/exports them as JSON using the JMiniApp framework.
+A small example app that ingests listening events, keeps aggregated stats, and imports/exports them as CSV (no JSON dependency) using the JMiniApp framework.
 
 ## Overview
 
 This example demonstrates how to build a mini-app that:
-- Imports existing listening stats from JSON
+- Imports existing listening stats from CSV
 - Lets you add play events (song, artist, minutes) and updates new additions
 - Updates top artists/songs
-- Exports the current state back to JSON file
+- Exports the current state back to CSV file
 
 ## Features
 
-- **Import stats**: Load `data/music_stats.json` into the app state.
-- **Export stats**: Save the current state back to `data/music_stats.json`.
+- **Import stats**: Load `data/music_stats.csv` into the app state.
+- **Export stats**: Save the current state back to `data/music_stats.csv`.
 - **Add play event**: Enter song/artist/minutes; totals and rankings update immediately.
 - **Live top lists**: Top artists/songs are derived from aggregated minutes.
 
@@ -27,9 +27,9 @@ music-wrapped/
 │   ├── MusicWrappedApp.java        # Main app with menu, import/export, play events
 │   ├── MusicWrappedAppRunner.java  # Bootstrap using JMiniAppRunner
 │   ├── MusicWrappedState.java      # Aggregated state (minutes per artist/song)
-│   └── MusicWrappedJSONAdapter.java# JSON adapter wiring
+│   └── MusicWrappedCSVAdapter.java # CSV adapter wiring (pipe/colon encoding)
 └── src/main/resources/
-    └── data/music_stats.json       # Sample stats data
+    └── data/music_stats.csv        # Sample stats data (CSV, no JSON)
 ```
 
 ## Key Components
@@ -37,8 +37,9 @@ music-wrapped/
 ### MusicWrappedState
 - Holds `artistMinutes`, `songMinutes`, `totalMinutesListened`, and derived `topArtists` / `topSongs`.
 
-### MusicWrappedJSONAdapter
-- Implements `JSONAdapter<MusicWrappedState>` to handle JSON import/export.
+### MusicWrappedCSVAdapter
+- Implements `CSVAdapter<MusicWrappedState>` to handle CSV import/export.
+- Serializes maps/lists using simple `|`-delimited entries and `key:value` pairs (escaped with `\` when needed) to avoid JSON entirely.
 
 ### MusicWrappedApp
 - Extends `JMiniApp`.
@@ -102,4 +103,4 @@ Minutes listened: 5
 Recorded play for 'New Song' by New Artist (+5 min)
 ```
 
-After adding plays, export with option `2` to persist updates to `data/music_stats.json`.
+After adding plays, export with option `2` to persist updates to `data/music_stats.csv`.
