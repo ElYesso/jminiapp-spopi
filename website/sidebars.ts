@@ -45,6 +45,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'examples/templates',
         'examples/counter',
+        'examples/music-wrapped',
       ],
     },
   ],
