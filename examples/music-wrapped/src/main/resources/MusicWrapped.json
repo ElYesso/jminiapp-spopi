@@ -1,10 +1,10 @@
 {
   "name": "music-wrapped",
-  "description": "Basic example showing music listening statistics from JSON.",
+  "description": "Basic example showing music listening statistics from CSV.",
   "adapter": {
-    "type": "json",
-    "class": "com.jminiapp.examples.musicwrapped.MusicWrappedJSONAdapter",
-    "source": "data/music_stats.json"
+    "type": "csv",
+    "class": "com.jminiapp.examples.musicwrapped.MusicWrappedCSVAdapter",
+    "source": "data/music_stats.csv"
   },
   "importStrategy": {
     "type": "replace"

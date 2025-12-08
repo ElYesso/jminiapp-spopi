@@ -13,7 +13,7 @@ import com.jminiapp.core.api.JMiniApp;
 import com.jminiapp.core.api.JMiniAppConfig;
 
 public class MusicWrappedApp extends JMiniApp {
-    private static final String DATA_PATH = "data/music_stats.json";
+    private static final String DATA_PATH = "data/music_stats.csv";
 
     private MusicWrappedState stats;
     private boolean running;
@@ -74,7 +74,7 @@ public class MusicWrappedApp extends JMiniApp {
 
     private void importStats() {
         try {
-            context.importData(DATA_PATH, "json");
+            context.importData(DATA_PATH, "csv");
             loadFromContext();
             recomputeTopLists();
             System.out.println("Imported stats from " + DATA_PATH);
@@ -87,7 +87,7 @@ public class MusicWrappedApp extends JMiniApp {
     private void exportStats() {
         try {
             context.setData(List.of(stats));
-            context.exportData(DATA_PATH, "json");
+            context.exportData(DATA_PATH, "csv");
             System.out.println("Exported stats to " + DATA_PATH);
         } catch (IOException e) {
             System.out.println("Could not export stats: " + e.getMessage());

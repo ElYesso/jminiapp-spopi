@@ -1,11 +1,12 @@
 package com.jminiapp.examples.musicwrapped;
 
-import com.jminiapp.core.adapters.JSONAdapter;
-
-public class MusicWrappedJSONAdapter implements JSONAdapter<MusicWrappedState> {
-
-	@Override
-	public Class<MusicWrappedState> getstateClass() {
-		return MusicWrappedState.class;
-	}
+/**
+ * Deprecated stub kept only for backward compatibility. The app now uses
+ * {@link MusicWrappedCSVAdapter} and no longer relies on JSON adapters.
+ */
+@Deprecated
+public final class MusicWrappedJSONAdapter {
+    private MusicWrappedJSONAdapter() {
+        throw new UnsupportedOperationException("Use MusicWrappedCSVAdapter instead.");
+    }
 }
